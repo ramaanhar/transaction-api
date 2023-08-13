@@ -1,0 +1,16 @@
+# credential
+.env
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# production
+/build
+/dist
+
+# misc
+yarn-error.log
+DS_Store

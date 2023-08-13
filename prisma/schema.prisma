@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Customer {
+  id            Int @id @default(autoincrement())
+  name          String
+  addresses     CustomerAddress[]
+  transactions  Transaction[]
+}
+
+model Product {
+  id                Int @id @default(autoincrement())
+  name              String
+  price             Decimal
+  transactionsRecap TransactionProduct[]
+}
+
+model PaymentMethod {
+  id                Int @id @default(autoincrement())
+  name              String
+  isActive          Boolean @default(true)
+  transactionsRecap TransactionPaymentMethod[]
+}
+
+model CustomerAddress {
+  id            Int @id @default(autoincrement())
+  customerId    Int
+  address       String @db.Text
+  customer      Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  transactions  Transaction[]
+}
+
+model Transaction {
+  id                Int @id @default(autoincrement())
+  customerId        Int
+  customerAddressId Int
+  customer          Customer @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  customerAddress   CustomerAddress @relation(fields: [customerAddressId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  products          TransactionProduct[]
+  paymentMethods    TransactionPaymentMethod[]
+}
+
+model TransactionProduct {
+  id              Int @id @default(autoincrement())
+  transactionId   Int
+  productId       Int
+  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  product         Product @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
+
+model TransactionPaymentMethod {
+  id              Int @id @default(autoincrement())
+  transactionId   Int
+  paymentMethodId Int
+  transaction     Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+}
